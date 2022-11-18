@@ -47,7 +47,7 @@ class Board(object):
         def collapseCoords(coords):
             blocks = [self.blocks[c[0]][c[1]] for c in coords]
             newBlocks = collapse(blocks)
-            for c, i in enumerate(coords):
+            for i, c in enumerate(coords):
                 self.blocks[c[0]][c[1]] = newBlocks[i]
 
         if direction == "s":
