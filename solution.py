@@ -4,45 +4,64 @@ from random import *
 squareWidth = 100
 squareHeight = 100
 
-class Block(object):
-    def __init__(self, value, column, row):
-        self.value = value
-        self.column = column
-        self.row = row
-        self.blockSquare, self.blockText = self.setDisplay()
-
-    def setDisplay(self):
-        column = self.column; row = self.row
-        x = (column * squareWidth) + (squareWidth // 2)
-        y = (row * squareHeight) + (squareHeight // 2)        
-        blockSquare = Square(min(squareWidth * 4 // 5, squareHeight * 4 // 5), Point(x, y))
-        blockSquare.setFillColor("yellow")
-        blockText = Text(str(self.value), 30, Point(x, y))
-        return blockSquare, blockText
-        
 class Board(object):
     def __init__(self, numberOfColumns, numberOfRows):
         self.__numberOfColumns = numberOfColumns
         self.__numberOfRows = numberOfRows
         self.blocks = [[None] * numberOfRows for i in range(numberOfColumns)]
         
-    def getBlocks(self):
-        return self.blocks
-
-    def setBlocks(self, blocks):
-        self.blocks = blocks
+    def getBlocks(self, column, row):
+        return self.blocks[column][row]
     
-    def setBlock(self, block):
-        if block.value != 0:
-            self.blocks[block.column][block.row] = block
-        else:
-            self.blocks[block.column][block.row] = None
+    def setBlock(self, block, column, row):
+        self.blocks[column][row] = block
 
-    def addBlock(self, coord):
-        pass # 빈칸 중 1개의 랜덤한 위치에 새 블록 하나 추가
+    def addBlock(self):
+        # https://github.com/gabrielecirulli/2048/blob/master/js/game_manager.js
+        # 확률은 여기서 가져옴
+        empty = []
+        for i in range(self.__numberOfColumns):
+            for j in range(self.__numberOfRows):
+                if self.blocks[i][j] is None:
+                    empty.append((i, j))
+        c = choice(empty)
+        block = 2 if randrange(10)<9 else 4
+        self.blocks[c[0]][c[1]] = block
 
     def move(self, direction):
-        pass # 플레이어의 조작, 블록들이 움직이고 충돌하는 것 처리
+        # 블록들을 합침
+        def collapse(blocks):
+            filtered = list(filter(lambda x:x is not None, blocks))
+            # None을 뺀 숫자들을 합침
+            def collapseNums(b):
+                if len(b) < 2:
+                    return b
+                if b[0] == b[1]:
+                    return [2*b[0]]+collapseNums(b[2:])
+                else:
+                    return [b[0]]+collapseNums(b[1:])
+            collapsed = collapseNums(filtered)
+            answer = collapsed+[None]*(len(blocks)-len(collapsed))
+            return answer
+
+        def collapseCoords(coords):
+            blocks = [self.blocks[c[0]][c[1]] for c in coords]
+            newBlocks = collapse(blocks)
+            for c, i in enumerate(coords):
+                self.blocks[c[0]][c[1]] = newBlocks[i]
+
+        if direction == "s":
+            for i in range(self.__numberOfColumns):
+                collapseCoords([(i, j) for j in range(self.__numberOfRows)])
+        elif direction == "w":
+            for i in range(self.__numberOfColumns):
+                collapseCoords([(i, j) for j in range(self.__numberOfRows-1, -1, -1)])
+        elif direction == "a":
+            for j in range(self.__numberOfRows):
+                collapseCoords([(i, j) for i in range(self.__numberOfColumns)])
+        elif direction == "d":
+            for j in range(self.__numberOfRows):
+                collapseCoords([(i, j) for i in range(self.__numberOfColumns-1, -1, -1)])
 
 class Game2048(object):
     def __init__(self, canvas, numberOfColumns, numberOfRows):
