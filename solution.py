@@ -9,12 +9,16 @@ class Board(object):
         self.__numberOfColumns = numberOfColumns
         self.__numberOfRows = numberOfRows
         self.blocks = [[None] * numberOfRows for i in range(numberOfColumns)]
+        self.newBlockCoord = None
         
-    def getBlocks(self, column, row):
+    def getBlock(self, column, row):
         return self.blocks[column][row]
     
     def setBlock(self, block, column, row):
         self.blocks[column][row] = block
+
+    def getNewBlockCoord(self):
+        return self.newBlockCoord
 
     def addBlock(self):
         # https://github.com/gabrielecirulli/2048/blob/master/js/game_manager.js
@@ -26,6 +30,7 @@ class Board(object):
                     empty.append((i, j))
         c = choice(empty)
         block = 2 if randrange(10)<9 else 4
+        self.newBlockCoord = (c[0], c[1])
         self.blocks[c[0]][c[1]] = block
 
     def move(self, direction):
@@ -50,10 +55,10 @@ class Board(object):
             for i, c in enumerate(coords):
                 self.blocks[c[0]][c[1]] = newBlocks[i]
 
-        if direction == "s":
+        if direction == "w":
             for i in range(self.__numberOfColumns):
                 collapseCoords([(i, j) for j in range(self.__numberOfRows)])
-        elif direction == "w":
+        elif direction == "s":
             for i in range(self.__numberOfColumns):
                 collapseCoords([(i, j) for j in range(self.__numberOfRows-1, -1, -1)])
         elif direction == "a":
@@ -100,10 +105,18 @@ class Game2048(object):
         self.__blockLayer.clear()
         for column in range(self.__numberOfColumns):
             for row in range(self.__numberOfRows):
-                blocks = self.getBoard().getBlocks()
-                if blocks[column][row] != None:
-                    self.__blockLayer.add(blocks[column][row].blockSquare)
-                    self.__blockLayer.add(blocks[column][row].blockText)
+                block = self.getBoard().getBlock(column, row)
+                if block != None:
+                    x = (column * squareWidth) + (squareWidth // 2)
+                    y = (row * squareHeight) + (squareHeight // 2)
+                    blockSquare = Square(min(squareWidth*4//5, squareHeight*4//5),Point(x,y))
+                    blockSquare = Square(min(squareWidth * 4 // 5, squareHeight * 4 // 5), Point(x, y))
+                    if (column, row) != self.getBoard().getNewBlockCoord():
+                        blockSquare.setFillColor("yellow")
+                    else: blockSquare.setFillColor("orange")
+                    blockText = Text(str(block), 30, Point(x,y))
+                    self.__blockLayer.add(blockSquare)
+                    self.__blockLayer.add(blockText)
 
 def runGame():
     NumberOfColumns = 6
@@ -112,14 +125,14 @@ def runGame():
     
     G2048 = Game2048(canvas, NumberOfColumns, NumberOfRows)
     G2048Board = G2048.getBoard()
-    G2048Board.setBlock(Block(2, 1, 1))
+    G2048Board.addBlock()
     G2048.displayBlocks()
     while True:
         e = canvas.wait()
         key = e.getKey()
-        print(key)
-        if key == "w":
-            G2048Board.move((-1, 0))
-        G2048.displayBlocks()
+        if key in ["w", "a", "s", "d"]:
+            G2048Board.move(key)
+            G2048Board.addBlock()
+            G2048.displayBlocks()
 
 runGame()
