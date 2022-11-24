@@ -1,3 +1,4 @@
+import copy
 from cs1graphics import *
 from random import *
 
@@ -13,6 +14,9 @@ class Board(object):
         
     def getBlock(self, column, row):
         return self.__blocks[column][row]
+
+    def getBlocks(self):
+        return self.__blocks
     
     def setBlock(self, block, column, row):
         self.__blocks[column][row] = block
@@ -29,14 +33,12 @@ class Board(object):
                 if self.__blocks[i][j] is None:
                     empty.append((i, j))
 
-        if len(empty) == 0:
-            return True
+        assert len(empty) != 0
 
         c = choice(empty)
         block = 2 if randrange(10)<9 else 4
         self.__newBlockCoord = (c[0], c[1])
         self.__blocks[c[0]][c[1]] = block
-        return False
 
     def move(self, direction):
         # 블록들을 합침
@@ -73,6 +75,14 @@ class Board(object):
             for j in range(self.__numberOfRows):
                 collapseCoords([(i, j) for i in range(self.__numberOfColumns-1, -1, -1)])
 
+    def canMove(self, direction):
+        newBoard = copy.deepcopy(self)
+        newBoard.move(direction)
+        return self.getBlocks() != newBoard.getBlocks()
+
+    def gameOver(self):
+        return not any(map(self.canMove, ["w", "s", "a", "d"]))
+
 class Game2048(object):
     def __init__(self, canvas, numberOfColumns, numberOfRows):
         self.__canvas = canvas
@@ -88,6 +98,9 @@ class Game2048(object):
 
     def getBoard(self):
         return self.__gameBoard
+
+    def setBoard(self, board):
+        self.__gameBoard = board
     
     def __displayGrid(self):
         self.__gridLayer = Layer()
@@ -144,9 +157,10 @@ def runGame():
         e = canvas.wait()
         key = e.getKey()
         if key in ["w", "s", "a", "d"]:
-            G2048Board.move(key)
-            gameOver = G2048Board.addBlock()
-            if gameOver: break
-            G2048.displayBlocks()
+            if G2048Board.canMove(key):
+                G2048Board.move(key)
+                G2048Board.addBlock()
+                G2048.displayBlocks()
+                if G2048Board.gameOver(): break
     G2048.showGameOverMessage()
 runGame()
