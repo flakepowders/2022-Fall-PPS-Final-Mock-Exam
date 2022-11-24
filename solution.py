@@ -11,12 +11,12 @@ class Board(object):
         self.__numberOfRows = numberOfRows
         self.__blocks = [[None] * numberOfRows for i in range(numberOfColumns)]
         self.__newBlockCoord = None
-        
-    def getBlock(self, column, row):
-        return self.__blocks[column][row]
 
     def getBlocks(self):
-        return self.__blocks
+        return self.__blocks    
+    
+    def getBlock(self, column, row):
+        return self.__blocks[column][row]
     
     def setBlock(self, block, column, row):
         self.__blocks[column][row] = block
@@ -38,7 +38,7 @@ class Board(object):
         c = choice(empty)
         block = 2 if randrange(10)<9 else 4
         self.__newBlockCoord = (c[0], c[1])
-        self.__blocks[c[0]][c[1]] = block
+        self.setBlock(block, c[0], c[1])
 
     def move(self, direction):
         # 블록들을 합침
