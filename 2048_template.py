@@ -1,4 +1,8 @@
-import copy
+################################
+# Student ID: 
+# Student Name: 
+################################
+
 from cs1graphics import *
 from random import *
 
