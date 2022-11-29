@@ -114,8 +114,8 @@ class Game2048(object):
         self.__canvas.add(self.__messageLayer) 
 
 def runGame():
-    NumberOfColumns = 4
-    NumberOfRows = 4
+    NumberOfColumns = 3
+    NumberOfRows = 3
 
     canvas = Canvas(squareHeight * NumberOfColumns, squareWidth * NumberOfRows, 'white', '2048')
     G2048 = Game2048(canvas, NumberOfColumns, NumberOfRows)
@@ -127,6 +127,10 @@ def runGame():
         e = canvas.wait()
         key = e.getKey()
         if key in ["w", "s", "a", "d"]:
-            pass # ADDITIONAL CODE HERE
+            if G2048Board.canMove(key):
+                G2048Board.move(key)
+                G2048Board.addBlock()
+                G2048.displayBlocks()
+                if G2048Board.gameOver(): break
     G2048.showGameOverMessage()
 runGame()
