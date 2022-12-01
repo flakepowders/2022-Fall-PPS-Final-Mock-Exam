@@ -13,11 +13,11 @@ class Board(object):
         self.__newBlockCoord = None
 
     def getBlocks(self):
-        return self.__blocks    
-    
+        return self.__blocks
+
     def getBlock(self, column, row):
         return self.__blocks[column][row]
-    
+
     def setBlock(self, block, column, row):
         self.__blocks[column][row] = block
 
