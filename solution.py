@@ -99,9 +99,6 @@ class Game2048(object):
     def getBoard(self):
         return self.__gameBoard
 
-    def setBoard(self, board):
-        self.__gameBoard = board
-    
     def __displayGrid(self):
         self.__gridLayer = Layer()
 
