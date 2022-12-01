@@ -18,10 +18,10 @@ class Board(object):
 
     def getBlocks(self):
         pass # ADDITIONAL CODE HERE
-    
+
     def getBlock(self, column, row):
         pass # ADDITIONAL CODE HERE
-    
+
     def setBlock(self, block, column, row):
         pass # ADDITIONAL CODE HERE
 
@@ -71,7 +71,7 @@ class Game2048(object):
 
     def getBoard(self):
         pass # ADDITIONAL CODE HERE
-    
+
     def __displayGrid(self):
         self.__gridLayer = Layer()
 
@@ -81,7 +81,7 @@ class Game2048(object):
             p.setBorderColor('black')
             p.setBorderWidth(1)
             self.__gridLayer.add(p)
-        
+
         for row in range(self.__numberOfRows + 1):
             p = Path(Point(0, squareHeight * row),
                    Point(self.__canvas.getWidth(), squareHeight * row))
